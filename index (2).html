@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard de Lealtad de Clientes — Cadena de Calzado</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js" crossorigin></script>
+
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #F5F1E8;
+    min-height: 100vh;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useMemo } = React;
+
+/* ============================== DATOS EMBEBIDOS ============================== */
+const EDU_DATA = {"Todos": {"n": 1000, "tasa_lealtad": 39.1, "pct_canjeo": 41.7, "avg_rrss": 3.1, "avg_meses": 17.6, "avg_visitas": 5.9, "pct_sigue_rrss": 50.1, "by_ciudad": {"Arequipa": {"count": 114, "tasa": 39.5}, "Cusco": {"count": 90, "tasa": 37.8}, "Lima": {"count": 443, "tasa": 39.1}, "Otras": {"count": 192, "tasa": 41.1}, "Piura": {"count": 66, "tasa": 37.9}, "Trujillo": {"count": 95, "tasa": 36.8}}, "by_generacion": {"Boomer": {"count": 29, "tasa": 27.6}, "Gen X": {"count": 246, "tasa": 37.0}, "Gen Z": {"count": 193, "tasa": 36.8}, "Millennial": {"count": 532, "tasa": 41.5}}, "by_tier": {"Bronce": {"count": 270, "tasa": 31.5}, "Ninguno": {"count": 270, "tasa": 20.0}, "Oro": {"count": 108, "tasa": 61.1}, "Plata": {"count": 352, "tasa": 52.8}}, "by_meses": [{"bucket": "0-6m", "count": 45, "tasa": 24.4}, {"bucket": "7-12m", "count": 108, "tasa": 23.1}, {"bucket": "13-24m", "count": 268, "tasa": 51.1}, {"bucket": "25-36m", "count": 183, "tasa": 53.0}, {"bucket": "37m+", "count": 126, "tasa": 53.2}], "by_canal_compra": {"App": {"count": 140, "tasa": 39.3}, "Redes sociales": {"count": 91, "tasa": 40.7}, "Tienda fisica": {"count": 470, "tasa": 38.3}, "Web": {"count": 299, "tasa": 39.8}}}, "Secundaria": {"n": 347, "tasa_lealtad": 38.3, "pct_canjeo": 39.2, "avg_rrss": 3.4, "avg_meses": 16.4, "avg_visitas": 5.9, "pct_sigue_rrss": 51.6, "by_ciudad": {"Arequipa": {"count": 45, "tasa": 40.0}, "Cusco": {"count": 33, "tasa": 36.4}, "Lima": {"count": 161, "tasa": 37.3}, "Otras": {"count": 54, "tasa": 35.2}, "Piura": {"count": 27, "tasa": 48.1}, "Trujillo": {"count": 27, "tasa": 40.7}}, "by_generacion": {"Boomer": {"count": 9, "tasa": 33.3}, "Gen X": {"count": 88, "tasa": 34.1}, "Gen Z": {"count": 63, "tasa": 39.7}, "Millennial": {"count": 187, "tasa": 40.1}}, "by_tier": {"Bronce": {"count": 102, "tasa": 32.4}, "Ninguno": {"count": 102, "tasa": 18.6}, "Oro": {"count": 34, "tasa": 52.9}, "Plata": {"count": 109, "tasa": 57.8}}, "by_meses": [{"bucket": "0-6m", "count": 21, "tasa": 23.8}, {"bucket": "7-12m", "count": 43, "tasa": 23.3}, {"bucket": "13-24m", "count": 86, "tasa": 54.7}, {"bucket": "25-36m", "count": 52, "tasa": 57.7}, {"bucket": "37m+", "count": 43, "tasa": 51.2}], "by_canal_compra": {"App": {"count": 54, "tasa": 33.3}, "Redes sociales": {"count": 34, "tasa": 47.1}, "Tienda fisica": {"count": 157, "tasa": 38.2}, "Web": {"count": 102, "tasa": 38.2}}}, "Tecnico": {"n": 271, "tasa_lealtad": 38.7, "pct_canjeo": 42.4, "avg_rrss": 3.0, "avg_meses": 18.2, "avg_visitas": 5.9, "pct_sigue_rrss": 51.7, "by_ciudad": {"Arequipa": {"count": 31, "tasa": 41.9}, "Cusco": {"count": 22, "tasa": 40.9}, "Lima": {"count": 117, "tasa": 37.6}, "Otras": {"count": 58, "tasa": 46.6}, "Piura": {"count": 18, "tasa": 16.7}, "Trujillo": {"count": 25, "tasa": 36.0}}, "by_generacion": {"Boomer": {"count": 7, "tasa": 14.3}, "Gen X": {"count": 60, "tasa": 35.0}, "Gen Z": {"count": 58, "tasa": 34.5}, "Millennial": {"count": 146, "tasa": 43.2}}, "by_tier": {"Bronce": {"count": 73, "tasa": 35.6}, "Ninguno": {"count": 73, "tasa": 17.8}, "Oro": {"count": 35, "tasa": 57.1}, "Plata": {"count": 90, "tasa": 51.1}}, "by_meses": [{"bucket": "0-6m", "count": 8, "tasa": 25.0}, {"bucket": "7-12m", "count": 28, "tasa": 17.9}, {"bucket": "13-24m", "count": 70, "tasa": 55.7}, {"bucket": "25-36m", "count": 55, "tasa": 50.9}, {"bucket": "37m+", "count": 37, "tasa": 48.6}], "by_canal_compra": {"App": {"count": 36, "tasa": 33.3}, "Redes sociales": {"count": 24, "tasa": 45.8}, "Tienda fisica": {"count": 130, "tasa": 36.9}, "Web": {"count": 81, "tasa": 42.0}}}, "Posgrado": {"n": 90, "tasa_lealtad": 38.9, "pct_canjeo": 37.8, "avg_rrss": 3.6, "avg_meses": 17.5, "avg_visitas": 6.2, "pct_sigue_rrss": 50.0, "by_ciudad": {"Arequipa": {"count": 9, "tasa": 44.4}, "Cusco": {"count": 8, "tasa": 25.0}, "Lima": {"count": 37, "tasa": 43.2}, "Otras": {"count": 19, "tasa": 42.1}, "Piura": {"count": 6, "tasa": 33.3}, "Trujillo": {"count": 11, "tasa": 27.3}}, "by_generacion": {"Boomer": {"count": 4, "tasa": 50.0}, "Gen X": {"count": 29, "tasa": 37.9}, "Gen Z": {"count": 16, "tasa": 43.8}, "Millennial": {"count": 41, "tasa": 36.6}}, "by_tier": {"Bronce": {"count": 16, "tasa": 37.5}, "Ninguno": {"count": 29, "tasa": 20.7}, "Oro": {"count": 7, "tasa": 71.4}, "Plata": {"count": 38, "tasa": 47.4}}, "by_meses": [{"bucket": "0-6m", "count": 3, "tasa": 66.7}, {"bucket": "7-12m", "count": 3, "tasa": 33.3}, {"bucket": "13-24m", "count": 30, "tasa": 43.3}, {"bucket": "25-36m", "count": 14, "tasa": 50.0}, {"bucket": "37m+", "count": 11, "tasa": 54.5}], "by_canal_compra": {"App": {"count": 11, "tasa": 54.5}, "Redes sociales": {"count": 7, "tasa": 14.3}, "Tienda fisica": {"count": 44, "tasa": 31.8}, "Web": {"count": 28, "tasa": 50.0}}}, "Universitario": {"n": 292, "tasa_lealtad": 40.4, "pct_canjeo": 45.2, "avg_rrss": 2.8, "avg_meses": 18.5, "avg_visitas": 5.9, "pct_sigue_rrss": 46.9, "by_ciudad": {"Arequipa": {"count": 29, "tasa": 34.5}, "Cusco": {"count": 27, "tasa": 40.7}, "Lima": {"count": 128, "tasa": 41.4}, "Otras": {"count": 61, "tasa": 41.0}, "Piura": {"count": 15, "tasa": 46.7}, "Trujillo": {"count": 32, "tasa": 37.5}}, "by_generacion": {"Boomer": {"count": 9, "tasa": 22.2}, "Gen X": {"count": 69, "tasa": 42.0}, "Gen Z": {"count": 56, "tasa": 33.9}, "Millennial": {"count": 158, "tasa": 43.0}}, "by_tier": {"Bronce": {"count": 79, "tasa": 25.3}, "Ninguno": {"count": 66, "tasa": 24.2}, "Oro": {"count": 32, "tasa": 71.9}, "Plata": {"count": 115, "tasa": 51.3}}, "by_meses": [{"bucket": "0-6m", "count": 13, "tasa": 15.4}, {"bucket": "7-12m", "count": 34, "tasa": 26.5}, {"bucket": "13-24m", "count": 82, "tasa": 46.3}, {"bucket": "25-36m", "count": 62, "tasa": 51.6}, {"bucket": "37m+", "count": 35, "tasa": 60.0}], "by_canal_compra": {"App": {"count": 39, "tasa": 48.7}, "Redes sociales": {"count": 26, "tasa": 34.6}, "Tienda fisica": {"count": 139, "tasa": 41.7}, "Web": {"count": 88, "tasa": 36.4}}}};
+
+const CITY_DETAIL = {"Arequipa": {"count": 114, "tasa_leal": 39.5, "avg_rrss": 2.5, "pct_canjeo": 40.4, "avg_meses": 16.6, "avg_ingreso_top": "1500-3000", "top_canal_compra": "Tienda fisica", "top_tier": "Plata", "top_generacion": "Millennial"}, "Cusco": {"count": 90, "tasa_leal": 37.8, "avg_rrss": 2.8, "pct_canjeo": 40.0, "avg_meses": 14.3, "avg_ingreso_top": "1500-3000", "top_canal_compra": "Tienda fisica", "top_tier": "Ninguno", "top_generacion": "Millennial"}, "Lima": {"count": 443, "tasa_leal": 39.1, "avg_rrss": 3.0, "pct_canjeo": 42.4, "avg_meses": 18.8, "avg_ingreso_top": "1500-3000", "top_canal_compra": "Tienda fisica", "top_tier": "Plata", "top_generacion": "Millennial"}, "Otras": {"count": 192, "tasa_leal": 41.1, "avg_rrss": 3.3, "pct_canjeo": 42.7, "avg_meses": 17.0, "avg_ingreso_top": "1500-3000", "top_canal_compra": "Tienda fisica", "top_tier": "Plata", "top_generacion": "Millennial"}, "Piura": {"count": 66, "tasa_leal": 37.9, "avg_rrss": 4.5, "pct_canjeo": 42.4, "avg_meses": 17.7, "avg_ingreso_top": "1500-3000", "top_canal_compra": "Tienda fisica", "top_tier": "Plata", "top_generacion": "Millennial"}, "Trujillo": {"count": 95, "tasa_leal": 36.8, "avg_rrss": 3.5, "pct_canjeo": 38.9, "avg_meses": 17.3, "avg_ingreso_top": "1500-3000", "top_canal_compra": "Web", "top_tier": "Plata", "top_generacion": "Millennial"}};
+
+const MODEL_RESULTS = {"models": {"Logistic Regression": {"accuracy": 68.0, "f1": 58.3, "roc_auc": 69.8, "precision": 59.6, "recall": 57.1}, "Random Forest": {"accuracy": 69.2, "f1": 57.9, "roc_auc": 70.3, "precision": 62.4, "recall": 54.1}, "KNN": {"accuracy": 56.0, "f1": 38.9, "roc_auc": 61.3, "precision": 42.7, "recall": 35.7}}, "feat_imp": [{"feature": "puntos_acumulados", "importance": 15.7}, {"feature": "meses_como_miembro", "importance": 14.0}, {"feature": "edad", "importance": 10.3}, {"feature": "interacciones_rrss_mes", "importance": 9.3}, {"feature": "visitas_web_mes", "importance": 8.3}, {"feature": "canal_captacion", "importance": 5.9}, {"feature": "tier_programa", "importance": 5.5}, {"feature": "ciudad", "importance": 5.4}], "cm_rf": [[120, 32], [45, 53]], "test_size": 250};
+
+const FEATURE_LABELS = {
+  puntos_acumulados: "Puntos acumulados",
+  meses_como_miembro: "Antigüedad (meses)",
+  edad: "Edad del cliente",
+  interacciones_rrss_mes: "Interacciones RRSS / mes",
+  visitas_web_mes: "Visitas web / mes",
+  canal_captacion: "Canal de captación",
+  tier_programa: "Tier del programa",
+  ciudad: "Ciudad",
+};
+
+const CITY_COORDS = {
+  Piura: { x: 100, y: 70 },
+  Trujillo: { x: 92, y: 165 },
+  Lima: { x: 106, y: 262 },
+  Cusco: { x: 190, y: 330 },
+  Arequipa: { x: 142, y: 405 },
+};
+
+const EDU_OPTIONS = ["Todos", "Secundaria", "Tecnico", "Universitario", "Posgrado"];
+const EDU_LABELS = { Todos: "Todos los niveles", Secundaria: "Secundaria", Tecnico: "Técnico", Universitario: "Universitario", Posgrado: "Posgrado" };
+const TIER_ORDER = ["Ninguno", "Bronce", "Plata", "Oro"];
+const MESES_LABELS = { "0-6m": "0–6 m", "7-12m": "7–12 m", "13-24m": "13–24 m", "25-36m": "25–36 m", "37m+": "37 m+" };
+
+/* ============================== UTILIDADES DE COLOR ============================== */
+function hex2rgb(hex) {
+  const h = hex.replace("#", "");
+  const v = parseInt(h, 16);
+  return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+}
+function rgb2hex(rgb) {
+  return "#" + rgb.map((x) => Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, "0")).join("");
+}
+function lerpColor(c1, c2, t) {
+  const r1 = hex2rgb(c1), r2 = hex2rgb(c2);
+  return rgb2hex(r1.map((v, i) => v + (r2[i] - v) * t));
+}
+function tasaColor(v) {
+  const stops = [
+    { p: 18, c: "#B6432E" },
+    { p: 38, c: "#C99A3C" },
+    { p: 60, c: "#3F6B52" },
+  ];
+  if (v <= stops[0].p) return stops[0].c;
+  if (v >= stops[stops.length - 1].p) return stops[stops.length - 1].c;
+  for (let i = 0; i < stops.length - 1; i++) {
+    if (v >= stops[i].p && v <= stops[i + 1].p) {
+      const t = (v - stops[i].p) / (stops[i + 1].p - stops[i].p);
+      return lerpColor(stops[i].c, stops[i + 1].c, t);
+    }
+  }
+  return stops[stops.length - 1].c;
+}
+
+/* ============================== PIEZAS DE UI ============================== */
+function Stitch() {
+  return <div className="stitch" />;
+}
+
+function Eyebrow({ children }) {
+  return <div className="eyebrow">{children}</div>;
+}
+
+function Tag({ id, label, active, onClick }) {
+  return (
+    <button className={"tab-tag" + (active ? " active" : "")} onClick={onClick}>
+      <span className="tab-num">{id}</span>
+      <span>{label}</span>
+    </button>
+  );
+}
+
+function Pill({ children, tone }) {
+  return <span className={"pill pill-" + tone}>{children}</span>;
+}
+
+function KpiCard({ label, value, suffix, delta, baseline, isBaseline, format }) {
+  let tone = "neu";
+  if (!isBaseline) {
+    if (delta > 0.4) tone = "pos";
+    else if (delta < -0.4) tone = "neg";
+  }
+  return (
+    <div className="ticket kpi-card">
+      <div className="perf-row">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <span key={i} className="perf-dot" />
+        ))}
+      </div>
+      <div className="kpi-label">{label}</div>
+      <div className="kpi-value">
+        {value}
+        <span className="kpi-suffix">{suffix}</span>
+      </div>
+      <div className={"kpi-delta tone-" + tone}>
+        <span className="dot" />
+        {isBaseline
+          ? "Base general (todos)"
+          : (delta > 0 ? "+" : "") + format(delta) + suffix + " vs. base general"}
+      </div>
+    </div>
+  );
+}
+
+function BarChartTier({ data }) {
+  const w = 600, h = 230, padL = 40, padB = 34, padT = 10;
+  const max = 70;
+  const bw = (w - padL - 20) / TIER_ORDER.length;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="chart-svg">
+      {[0, 20, 40, 60].map((g) => (
+        <g key={g}>
+          <line x1={padL} x2={w - 10} y1={h - padB - (g / max) * (h - padB - padT)} y2={h - padB - (g / max) * (h - padB - padT)} stroke="#E3DAC4" strokeWidth="1" />
+          <text x={padL - 8} y={h - padB - (g / max) * (h - padB - padT) + 4} textAnchor="end" className="axis-label">{g}%</text>
+        </g>
+      ))}
+      {TIER_ORDER.map((tier, i) => {
+        const d = data.by_tier[tier];
+        if (!d) return null;
+        const barH = (d.tasa / max) * (h - padB - padT);
+        const x = padL + i * bw + bw * 0.18;
+        const bw2 = bw * 0.64;
+        const y = h - padB - barH;
+        return (
+          <g key={tier}>
+            <rect x={x} y={y} width={bw2} height={barH} rx="6" fill={tasaColor(d.tasa)} />
+            <text x={x + bw2 / 2} y={y - 8} textAnchor="middle" className="bar-value">{d.tasa}%</text>
+            <text x={x + bw2 / 2} y={h - padB + 18} textAnchor="middle" className="axis-label">{tier}</text>
+            <text x={x + bw2 / 2} y={h - padB + 32} textAnchor="middle" className="axis-sublabel">n={d.count}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function TrendChart({ data }) {
+  const w = 600, h = 230, padL = 40, padB = 34, padT = 16, padR = 16;
+  const max = 70;
+  const pts = data.by_meses;
+  const innerW = w - padL - padR;
+  const stepX = innerW / (pts.length - 1);
+  const coords = pts.map((p, i) => ({
+    x: padL + i * stepX,
+    y: h - padB - (p.tasa / max) * (h - padB - padT),
+    ...p,
+  }));
+  const line = coords.map((c) => `${c.x},${c.y}`).join(" ");
+  const area = `${padL},${h - padB} ` + line + ` ${padL + innerW},${h - padB}`;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="chart-svg">
+      {[0, 20, 40, 60].map((g) => (
+        <g key={g}>
+          <line x1={padL} x2={w - padR} y1={h - padB - (g / max) * (h - padB - padT)} y2={h - padB - (g / max) * (h - padB - padT)} stroke="#E3DAC4" strokeWidth="1" />
+          <text x={padL - 8} y={h - padB - (g / max) * (h - padB - padT) + 4} textAnchor="end" className="axis-label">{g}%</text>
+        </g>
+      ))}
+      <polygon points={area} fill="#C99A3C22" />
+      <polyline points={line} fill="none" stroke="#C99A3C" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
+      {coords.map((c, i) => (
+        <g key={i}>
+          <circle cx={c.x} cy={c.y} r="5.5" fill={tasaColor(c.tasa)} stroke="#FFFDF8" strokeWidth="2" />
+          <text x={c.x} y={c.y - 14} textAnchor="middle" className="bar-value">{c.tasa}%</text>
+          <text x={c.x} y={h - padB + 18} textAnchor="middle" className="axis-label">{MESES_LABELS[c.bucket]}</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function PeruMap({ filterData, onSelect, selected }) {
+  const w = 300, h = 460;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="map-svg">
+      <path
+        d="M150,12 C118,42 98,82 92,140 C86,200 108,230 100,300 C95,355 108,400 138,438 C160,455 188,452 206,432 C234,398 250,358 244,310 C240,268 256,222 232,162 C214,118 184,58 150,12 Z"
+        fill="#EDE4CC"
+        stroke="#C99A3C"
+        strokeWidth="1.5"
+        opacity="0.9"
+      />
+      {Object.entries(CITY_COORDS).map(([city, pos]) => {
+        const d = filterData.by_ciudad[city];
+        if (!d) return null;
+        const r = 9 + Math.sqrt(d.count) * 1.6;
+        const isSel = selected === city;
+        return (
+          <g key={city} onClick={() => onSelect(city)} style={{ cursor: "pointer" }}>
+            <circle cx={pos.x} cy={pos.y} r={r} fill={tasaColor(d.tasa)} opacity={isSel ? 1 : 0.85} stroke={isSel ? "#211D1A" : "#FFFDF8"} strokeWidth={isSel ? 2.5 : 1.5} />
+            <text x={pos.x} y={pos.y - r - 6} textAnchor="middle" className="map-city-label">{city}</text>
+            <text x={pos.x} y={pos.y + 4} textAnchor="middle" className="map-city-value">{d.tasa}%</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function CityDetailPanel({ city }) {
+  if (!city) {
+    return (
+      <div className="city-detail empty">
+        <p>Haz clic en una ciudad del mapa para ver el detalle completo (drill-through).</p>
+      </div>
+    );
+  }
+  const d = CITY_DETAIL[city];
+  return (
+    <div className="city-detail">
+      <div className="city-detail-head">
+        <div>
+          <div className="eyebrow">DETALLE · BASE COMPLETA</div>
+          <h4>{city}</h4>
+        </div>
+        <Pill tone={d.tasa_leal >= 40 ? "pos" : d.tasa_leal >= 35 ? "neu" : "neg"}>{d.tasa_leal}% leales</Pill>
+      </div>
+      <div className="city-detail-grid">
+        <div><span className="cd-label">Clientes</span><span className="cd-value">{d.count}</span></div>
+        <div><span className="cd-label">Canjeo recompensa</span><span className="cd-value">{d.pct_canjeo}%</span></div>
+        <div><span className="cd-label">Interac. RRSS/mes</span><span className="cd-value">{d.avg_rrss}</span></div>
+        <div><span className="cd-label">Antigüedad prom.</span><span className="cd-value">{d.avg_meses} m</span></div>
+        <div><span className="cd-label">Tier dominante</span><span className="cd-value">{d.top_tier}</span></div>
+        <div><span className="cd-label">Canal principal</span><span className="cd-value">{d.top_canal_compra}</span></div>
+        <div><span className="cd-label">Generación top</span><span className="cd-value">{d.top_generacion}</span></div>
+        <div><span className="cd-label">Ingreso típico</span><span className="cd-value">S/ {d.avg_ingreso_top}</span></div>
+      </div>
+    </div>
+  );
+}
+
+function ModelCard({ name, m, recommended }) {
+  return (
+    <div className={"ticket model-card" + (recommended ? " recommended" : "")}>
+      {recommended && <div className="reco-flag">RECOMENDADO</div>}
+      <div className="model-name">{name}</div>
+      <div className="model-metrics">
+        <div><span className="mm-label">Accuracy</span><span className="mm-value">{m.accuracy}%</span></div>
+        <div><span className="mm-label">F1-Score</span><span className="mm-value">{m.f1}%</span></div>
+        <div><span className="mm-label">ROC-AUC</span><span className="mm-value">{m.roc_auc}%</span></div>
+        <div><span className="mm-label">Precisión</span><span className="mm-value">{m.precision}%</span></div>
+        <div><span className="mm-label">Recall</span><span className="mm-value">{m.recall}%</span></div>
+      </div>
+    </div>
+  );
+}
+
+function FeatureImportanceChart({ data }) {
+  const w = 600, h = 300, padL = 190, padR = 50, padT = 10, padB = 10;
+  const max = Math.max(...data.map((d) => d.importance)) * 1.15;
+  const rowH = (h - padT - padB) / data.length;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="chart-svg">
+      {data.map((d, i) => {
+        const barW = ((w - padL - padR) * d.importance) / max;
+        const y = padT + i * rowH + rowH * 0.22;
+        const bh = rowH * 0.56;
+        return (
+          <g key={d.feature}>
+            <text x={padL - 10} y={y + bh / 2 + 4} textAnchor="end" className="axis-label">{FEATURE_LABELS[d.feature] || d.feature}</text>
+            <rect x={padL} y={y} width={barW} height={bh} rx="5" fill={i < 2 ? "#BB4430" : i < 5 ? "#C99A3C" : "#2D5F7C"} />
+            <text x={padL + barW + 8} y={y + bh / 2 + 4} className="bar-value">{d.importance}%</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function ConfusionMatrix({ cm, testSize }) {
+  const [[tn, fp], [fn, tp]] = cm;
+  return (
+    <div className="cm-wrap">
+      <div className="cm-grid">
+        <div className="cm-cell cm-tn"><span className="cm-n">{tn}</span><span className="cm-l">No leal → No leal (correcto)</span></div>
+        <div className="cm-cell cm-fp"><span className="cm-n">{fp}</span><span className="cm-l">No leal → Leal (error)</span></div>
+        <div className="cm-cell cm-fn"><span className="cm-n">{fn}</span><span className="cm-l">Leal → No leal (riesgo no detectado)</span></div>
+        <div className="cm-cell cm-tp"><span className="cm-n">{tp}</span><span className="cm-l">Leal → Leal (correcto)</span></div>
+      </div>
+      <p className="cm-note">Sobre {testSize} clientes de prueba (Random Forest). El modelo detecta correctamente a {tp + tn} de {testSize} casos.</p>
+    </div>
+  );
+}
+
+function ScenarioChart() {
+  const months = [0, 3, 6, 9, 12];
+  const malo = [39.1, 38.6, 38.1, 37.8, 37.6];
+  const prom = [39.1, 40.8, 42.1, 43.1, 43.8];
+  const w = 600, h = 240, padL = 40, padR = 16, padT = 16, padB = 30;
+  const max = 48, min = 34;
+  const innerW = w - padL - padR;
+  const stepX = innerW / (months.length - 1);
+  const toY = (v) => h - padB - ((v - min) / (max - min)) * (h - padB - padT);
+  const lineOf = (arr) => arr.map((v, i) => `${padL + i * stepX},${toY(v)}`).join(" ");
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="chart-svg">
+      {[34, 38, 42, 46].map((g) => (
+        <g key={g}>
+          <line x1={padL} x2={w - padR} y1={toY(g)} y2={toY(g)} stroke="#E3DAC4" strokeWidth="1" />
+          <text x={padL - 8} y={toY(g) + 4} textAnchor="end" className="axis-label">{g}%</text>
+        </g>
+      ))}
+      <polyline points={lineOf(malo)} fill="none" stroke="#BB4430" strokeWidth="3" strokeDasharray="6 5" strokeLinecap="round" />
+      <polyline points={lineOf(prom)} fill="none" stroke="#3F6B52" strokeWidth="3" strokeLinecap="round" />
+      {months.map((mo, i) => (
+        <text key={mo} x={padL + i * stepX} y={h - padB + 18} textAnchor="middle" className="axis-label">{mo === 0 ? "Hoy" : `+${mo}m`}</text>
+      ))}
+      <circle cx={padL + 4 * stepX} cy={toY(37.6)} r="5" fill="#BB4430" />
+      <text x={padL + 4 * stepX} y={toY(37.6) - 12} textAnchor="middle" className="bar-value" fill="#BB4430">37.6%</text>
+      <circle cx={padL + 4 * stepX} cy={toY(43.8)} r="5" fill="#3F6B52" />
+      <text x={padL + 4 * stepX} y={toY(43.8) - 12} textAnchor="middle" className="bar-value" fill="#3F6B52">43.8%</text>
+    </svg>
+  );
+}
+
+/* ============================== TABS ============================== */
+function TabSituacion() {
+  const [edu, setEdu] = useState("Todos");
+  const [city, setCity] = useState(null);
+  const data = EDU_DATA[edu];
+  const base = EDU_DATA["Todos"];
+
+  return (
+    <div className="tab-content">
+      <div className="filter-row">
+        <div>
+          <Eyebrow>SEGMENTADOR · NIVEL EDUCATIVO (proxy de ocupación)</Eyebrow>
+          <p className="filter-help">Filtra todo el panel por nivel educativo del cliente, usado como aproximación de su perfil ocupacional.</p>
+        </div>
+        <select className="select" value={edu} onChange={(e) => setEdu(e.target.value)}>
+          {EDU_OPTIONS.map((o) => (
+            <option key={o} value={o}>{EDU_LABELS[o]}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="kpi-grid">
+        <KpiCard label="Tasa de lealtad" value={data.tasa_lealtad} suffix="%" delta={data.tasa_lealtad - base.tasa_lealtad} isBaseline={edu === "Todos"} format={(v) => v.toFixed(1)} />
+        <KpiCard label="Canjeo de recompensas" value={data.pct_canjeo} suffix="%" delta={data.pct_canjeo - base.pct_canjeo} isBaseline={edu === "Todos"} format={(v) => v.toFixed(1)} />
+        <KpiCard label="Interacciones RRSS / mes" value={data.avg_rrss} suffix="" delta={data.avg_rrss - base.avg_rrss} isBaseline={edu === "Todos"} format={(v) => v.toFixed(1)} />
+        <KpiCard label="Antigüedad promedio" value={data.avg_meses} suffix=" m" delta={data.avg_meses - base.avg_meses} isBaseline={edu === "Todos"} format={(v) => v.toFixed(1)} />
+      </div>
+
+      <div className="viz-grid-2">
+        <div className="card">
+          <Eyebrow>DISTRIBUCIÓN</Eyebrow>
+          <h3>El tier del programa marca la diferencia en lealtad</h3>
+          <BarChartTier data={data} />
+        </div>
+        <div className="card">
+          <Eyebrow>TENDENCIA TEMPORAL</Eyebrow>
+          <h3>La lealtad se duplica después del primer año</h3>
+          <TrendChart data={data} />
+        </div>
+      </div>
+
+      <div className="card map-card">
+        <Eyebrow>GEOGRAFÍA · MAPA DE CALOR POR CIUDAD</Eyebrow>
+        <h3>Lima concentra la base, pero no es la más leal</h3>
+        <p className="muted-note">Granularidad real del dataset: ciudad (no hay distritos de Lima en los datos). Color = tasa de lealtad · tamaño = N° de clientes. Haz clic en una ciudad para el detalle.</p>
+        <div className="map-layout">
+          <PeruMap filterData={data} onSelect={(c) => setCity(c === city ? null : c)} selected={city} />
+          <div className="map-side">
+            <div className="legend">
+              <span className="legend-chip" style={{ background: "#B6432E" }} /> Baja lealtad
+              <span className="legend-chip" style={{ background: "#C99A3C" }} /> Media
+              <span className="legend-chip" style={{ background: "#3F6B52" }} /> Alta lealtad
+            </div>
+            {data.by_ciudad["Otras"] && (
+              <div className="otras-chip">
+                <strong>Otras ciudades</strong>
+                <span>{data.by_ciudad["Otras"].count} clientes · {data.by_ciudad["Otras"].tasa}% leales</span>
+                <em>(agrupa ciudades fuera de las 5 principales; sin geolocalización individual en el dataset)</em>
+              </div>
+            )}
+            <CityDetailPanel city={city} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TabPredictivo() {
+  const m = MODEL_RESULTS.models;
+  return (
+    <div className="tab-content">
+      <Eyebrow>MODELO DE CLASIFICACIÓN</Eyebrow>
+      <h3>¿Qué cliente se volverá leal? Tres modelos puestos a prueba</h3>
+      <p className="muted-note">Variable objetivo: <code>es_leal</code>. Entrenamiento con 75% de los datos, evaluación sobre el 25% restante ({MODEL_RESULTS.test_size} clientes).</p>
+      <div className="model-grid">
+        <ModelCard name="Regresión Logística" m={m["Logistic Regression"]} />
+        <ModelCard name="Random Forest" m={m["Random Forest"]} recommended />
+        <ModelCard name="K-Nearest Neighbors" m={m["KNN"]} />
+      </div>
+
+      <div className="viz-grid-2" style={{ marginTop: 28 }}>
+        <div className="card">
+          <Eyebrow>VARIABLES MÁS DETERMINANTES</Eyebrow>
+          <h3>Lo que más explica la lealtad (Random Forest)</h3>
+          <FeatureImportanceChart data={MODEL_RESULTS.feat_imp} />
+        </div>
+        <div className="card">
+          <Eyebrow>MATRIZ DE CONFUSIÓN</Eyebrow>
+          <h3>Desempeño del modelo recomendado</h3>
+          <ConfusionMatrix cm={MODEL_RESULTS.cm_rf} testSize={MODEL_RESULTS.test_size} />
+        </div>
+      </div>
+
+      <div className="card" style={{ marginTop: 28 }}>
+        <Eyebrow>ESCENARIOS A 12 MESES</Eyebrow>
+        <h3>Sin intervención vs. con campaña de fidelización</h3>
+        <ScenarioChart />
+        <div className="scenario-cards">
+          <div className="scenario-card scenario-malo">
+            <Pill tone="neg">ESCENARIO MALO</Pill>
+            <p><strong>Sin intervención.</strong> Manteniendo el mismo mix de captación (27% de clientes nuevos sin enrolarse al programa), la base proyectada llega a 1,100 clientes con una tasa de lealtad de <strong>37.6%</strong> (414 leales). Esto suma <strong>77 clientes no leales adicionales</strong> frente a hoy.</p>
+          </div>
+          <div className="scenario-card scenario-prometedor">
+            <Pill tone="pos">ESCENARIO PROMETEDOR</Pill>
+            <p><strong>Con campaña de onboarding acelerado</strong> dirigida a clientes sin tier y nuevos miembros (&lt;12 meses), la tasa de lealtad proyectada sube a <strong>43.8%</strong> (482 leales) en 12 meses: <strong>+6.2 puntos</strong> y <strong>68 clientes leales adicionales</strong> frente al escenario sin intervención.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NarrativaPanel({ tone, eyebrow, title, children }) {
+  return (
+    <div className={"narrative-panel tone-border-" + tone}>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h3>{title}</h3>
+      <p>{children}</p>
+    </div>
+  );
+}
+
+function TabNarrativa() {
+  return (
+    <div className="tab-content">
+      <Eyebrow>NARRATIVA EJECUTIVA · S → C → R</Eyebrow>
+      <h3>La historia completa para el Director de Marketing</h3>
+
+      <NarrativaPanel tone="blue" eyebrow="S — SITUACIÓN" title="Dónde estamos hoy">
+        De 1,000 clientes activos del programa de fidelización, solo el 39.1% es leal (391 clientes). El tier Oro alcanza 61.1% de lealtad, pero el 27% de la base (270 clientes) no está inscrito en ningún tier y apenas logra 20.0% de lealtad. Los clientes con menos de 12 meses de antigüedad muestran solo 23–24% de lealtad, frente a 51–53% después del primer año.
+      </NarrativaPanel>
+
+      <NarrativaPanel tone="red" eyebrow="C — COMPLICACIÓN" title="Por qué es urgente actuar">
+        El riesgo de fuga se concentra en los clientes sin tier y en los nuevos miembros: juntos explican la mayor parte de los 609 clientes no leales actuales. Sin intervención, en 12 meses —con un crecimiento moderado de cartera (+10%)— la tasa de lealtad global caería a 37.6%, sumando 77 clientes no leales adicionales. Cada cliente que no se enrola en el programa dentro de su primer año tiene más de 2 veces menos probabilidad de volverse leal.
+      </NarrativaPanel>
+
+      <NarrativaPanel tone="green" eyebrow="R — RESOLUCIÓN" title="Qué hacer y con qué meta">
+        Se recomienda lanzar, antes del 30 de junio de 2027, una campaña de onboarding acelerado al programa de fidelización dirigida a clientes sin tier y nuevos miembros, bajo responsabilidad del Gerente de CRM y Fidelización, con seguimiento mensual. Bajo el escenario prometedor, la tasa de lealtad global subiría a 43.8% (+6.2 puntos vs. no actuar), equivalente a 68 clientes leales adicionales en 12 meses.
+      </NarrativaPanel>
+
+      <div className="card" style={{ marginTop: 28 }}>
+        <Eyebrow>COMPLICACIÓN FORMALIZADA · OBJETIVO SMART</Eyebrow>
+        <h3 className="smart-quote">"Reducir la tasa de no-lealtad (churn) del programa de fidelización de 60.9% a 56.0% antes del 30 de junio de 2027, medido mensualmente mediante el dashboard de CRM, bajo responsabilidad del Gerente de CRM y Fidelización."</h3>
+
+        <div className="kpi-table-wrap">
+          <table className="kpi-table">
+            <thead>
+              <tr><th>KPI</th><th>Fórmula / descripción</th><th>Valor actual</th><th>Meta (12 m)</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Tasa de lealtad global</td>
+                <td>Clientes leales / total de clientes</td>
+                <td>39.1%</td>
+                <td className="meta-pos">44.0%</td>
+              </tr>
+              <tr>
+                <td>% clientes sin programa</td>
+                <td>Clientes en tier "Ninguno" / total</td>
+                <td>27.0%</td>
+                <td className="meta-pos">15.0%</td>
+              </tr>
+              <tr>
+                <td>Lealtad en clientes nuevos (&lt;12 m)</td>
+                <td>Leales con &lt;12 meses / total nuevos</td>
+                <td>23.5%</td>
+                <td className="meta-pos">35.0%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== APP ============================== */
+function App() {
+  const [tab, setTab] = useState("situacion");
+  return (
+    <div className="app-root">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+        .app-root {
+          --bg: #F5F1E8;
+          --surface: #FFFDF8;
+          --ink: #211D1A;
+          --muted: #6E6557;
+          --border: #E3DAC4;
+          --red: #B6432E;
+          --green: #3F6B52;
+          --blue: #2D5F7C;
+          --gold: #C99A3C;
+          --red-soft: #F2DCD3;
+          --green-soft: #DDE6DD;
+          --blue-soft: #D9E5EA;
+          --gold-soft: #F1E4C7;
+          background: var(--bg);
+          color: var(--ink);
+          font-family: 'Inter', sans-serif;
+          padding: 28px 28px 48px;
+          min-height: 100%;
+          box-sizing: border-box;
+        }
+        .app-root * { box-sizing: border-box; }
+        .app-root h1, .app-root h3, .app-root h4 { font-family: 'Fraunces', serif; margin: 0; }
+        .eyebrow {
+          font-family: 'IBM Plex Mono', monospace;
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          color: var(--gold);
+          font-weight: 600;
+          margin-bottom: 6px;
+        }
+        .header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; }
+        .header-title { font-size: 30px; font-weight: 700; line-height: 1.1; }
+        .header-sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+        .stitch { border-top: 2px dashed var(--gold); opacity: 0.6; margin: 18px 0; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+        .tab-tag {
+          display: flex; align-items: center; gap: 8px;
+          background: var(--surface); border: 1.5px solid var(--border);
+          border-radius: 999px; padding: 9px 18px 9px 8px;
+          font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
+          color: var(--muted); cursor: pointer; transition: all 0.15s ease;
+        }
+        .tab-tag.active { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+        .tab-num {
+          font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+          background: var(--gold-soft); color: var(--ink); border-radius: 999px;
+          width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+        }
+        .tab-tag.active .tab-num { background: var(--gold); }
+
+        .tab-content h3 { font-size: 21px; font-weight: 600; margin: 4px 0 16px; }
+        .muted-note { color: var(--muted); font-size: 13px; margin-top: -8px; margin-bottom: 16px; }
+        .muted-note code { background: var(--gold-soft); padding: 1px 6px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; }
+
+        .filter-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 20px; margin-bottom: 24px; }
+        .filter-help { font-size: 13px; color: var(--muted); margin: 0; max-width: 480px; }
+        .select { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--bg); color: var(--ink); cursor: pointer; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .ticket { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; position: relative; }
+        .perf-row { display: flex; gap: 5px; margin-bottom: 10px; }
+        .perf-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--border); }
+        .kpi-label { font-size: 12.5px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+        .kpi-value { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 600; line-height: 1; }
+        .kpi-suffix { font-size: 18px; color: var(--muted); margin-left: 2px; }
+        .kpi-delta { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; margin-top: 10px; }
+        .kpi-delta .dot { width: 7px; height: 7px; border-radius: 50%; }
+        .tone-pos .dot, .tone-pos { color: var(--green); }
+        .tone-pos .dot { background: var(--green); }
+        .tone-neg .dot, .tone-neg { color: var(--red); }
+        .tone-neg .dot { background: var(--red); }
+        .tone-neu .dot, .tone-neu { color: var(--muted); }
+        .tone-neu .dot { background: var(--gold); }
+
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+        .viz-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 24px; }
+        .chart-svg { width: 100%; height: auto; }
+        .axis-label { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: var(--muted); }
+        .axis-sublabel { font-family: 'IBM Plex Mono', monospace; font-size: 9px; fill: var(--muted); opacity: 0.7; }
+        .bar-value { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; fill: var(--ink); }
+
+        .map-card { margin-bottom: 8px; }
+        .map-layout { display: grid; grid-template-columns: 300px 1fr; gap: 24px; align-items: start; margin-top: 8px; }
+        .map-svg { width: 100%; max-width: 280px; height: auto; }
+        .map-city-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; fill: var(--ink); }
+        .map-city-value { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; fill: #FFFDF8; }
+        .map-side { display: flex; flex-direction: column; gap: 14px; }
+        .legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+        .legend-chip { width: 12px; height: 12px; border-radius: 3px; display: inline-block; margin-right: 2px; }
+        .otras-chip { background: var(--gold-soft); border-radius: 10px; padding: 10px 14px; font-size: 12.5px; display: flex; flex-direction: column; gap: 2px; }
+        .otras-chip em { color: var(--muted); font-style: italic; font-size: 11px; }
+
+        .city-detail { background: var(--bg); border: 1px dashed var(--border); border-radius: 12px; padding: 16px; min-height: 120px; }
+        .city-detail.empty { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; text-align: center; }
+        .city-detail-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .city-detail-head h4 { font-size: 18px; margin-top: 2px; }
+        .city-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+        .cd-label { display: block; font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+        .cd-value { display: block; font-weight: 600; font-size: 14px; }
+
+        .pill { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+        .pill-pos { background: var(--green-soft); color: var(--green); }
+        .pill-neg { background: var(--red-soft); color: var(--red); }
+        .pill-neu { background: var(--gold-soft); color: #8a6a1f; }
+
+        .model-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 14px; }
+        .model-card { position: relative; }
+        .model-card.recommended { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold-soft); }
+        .reco-flag { position: absolute; top: -10px; right: 14px; background: var(--gold); color: var(--ink); font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; letter-spacing: 0.04em; }
+        .model-name { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; margin-bottom: 14px; }
+        .model-metrics { display: flex; flex-direction: column; gap: 8px; }
+        .model-metrics > div { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border); padding-bottom: 6px; font-size: 13px; }
+        .mm-label { color: var(--muted); }
+        .mm-value { font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+
+        .cm-wrap { margin-top: 8px; }
+        .cm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .cm-cell { border-radius: 12px; padding: 16px; text-align: center; }
+        .cm-n { display: block; font-family: 'Fraunces', serif; font-size: 30px; font-weight: 700; }
+        .cm-l { display: block; font-size: 11px; margin-top: 4px; opacity: 0.85; }
+        .cm-tn { background: var(--green-soft); color: var(--green); }
+        .cm-tp { background: var(--green-soft); color: var(--green); }
+        .cm-fp { background: var(--gold-soft); color: #8a6a1f; }
+        .cm-fn { background: var(--red-soft); color: var(--red); }
+        .cm-note { font-size: 12.5px; color: var(--muted); margin-top: 12px; }
+
+        .scenario-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+        .scenario-card { border-radius: 14px; padding: 18px; font-size: 13.5px; line-height: 1.55; }
+        .scenario-card p { margin: 10px 0 0; }
+        .scenario-malo { background: var(--red-soft); }
+        .scenario-prometedor { background: var(--green-soft); }
+
+        .narrative-panel { background: var(--surface); border: 1px solid var(--border); border-left: 5px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-bottom: 16px; }
+        .narrative-panel p { font-size: 14.5px; line-height: 1.7; margin: 0; color: #3a342c; }
+        .narrative-panel h3 { font-size: 19px; margin-bottom: 8px; }
+        .tone-border-blue { border-left-color: var(--blue); }
+        .tone-border-blue .eyebrow { color: var(--blue); }
+        .tone-border-red { border-left-color: var(--red); }
+        .tone-border-red .eyebrow { color: var(--red); }
+        .tone-border-green { border-left-color: var(--green); }
+        .tone-border-green .eyebrow { color: var(--green); }
+
+        .smart-quote { font-size: 17px; font-weight: 600; line-height: 1.5; font-style: italic; background: var(--gold-soft); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; }
+        .kpi-table-wrap { overflow-x: auto; }
+        .kpi-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+        .kpi-table th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; padding: 8px 12px; border-bottom: 2px solid var(--border); }
+        .kpi-table td { padding: 12px 12px; border-bottom: 1px solid var(--border); }
+        .meta-pos { color: var(--green); font-weight: 700; }
+
+        @media (max-width: 880px) {
+          .kpi-grid { grid-template-columns: 1fr 1fr; }
+          .viz-grid-2, .model-grid, .scenario-cards { grid-template-columns: 1fr; }
+          .map-layout { grid-template-columns: 1fr; }
+        }
+      `}</style>
+
+      <div className="header">
+        <div>
+          <Eyebrow>DASHBOARD EJECUTIVO · DIRECCIÓN DE MARKETING</Eyebrow>
+          <div className="header-title">Lealtad de clientes — cadena de calzado</div>
+          <div className="header-sub">Programa de fidelización · 1,000 clientes · narrativa S → C → R</div>
+        </div>
+      </div>
+      <Stitch />
+
+      <div className="tabs">
+        <Tag id="01" label="Situación" active={tab === "situacion"} onClick={() => setTab("situacion")} />
+        <Tag id="02" label="Predictivo" active={tab === "predictivo"} onClick={() => setTab("predictivo")} />
+        <Tag id="03" label="Narrativa" active={tab === "narrativa"} onClick={() => setTab("narrativa")} />
+      </div>
+
+      {tab === "situacion" && <TabSituacion />}
+      {tab === "predictivo" && <TabPredictivo />}
+      {tab === "narrativa" && <TabNarrativa />}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
